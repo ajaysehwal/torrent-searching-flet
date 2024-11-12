@@ -5,12 +5,10 @@ import asyncio
 from datetime import datetime
 from flet import *
 import flet as ft
-
-# Import custom components and utilities
 from components import MovieDetails, SearchCard, navbar, hero
-from utils.helpers import get_movie_details, search_movies
+from helpers import get_movie_details, search_movies
 from components.skeltons import searchResults
-
+from utils.speaktotext import SpeechToText
 OMDB_API_URL = "http://www.omdbapi.com/"
 OMDB_API_KEY = "494e9276"
 
@@ -104,13 +102,23 @@ class TorrentSearching:
             autofocus=True,
             on_tap=self.handle_tap,
             on_submit=self.handle_search,
-            bar_trailing=[IconButton(icon=icons.MIC, tooltip="Voice Search"), IconButton(icon=icons.SEARCH, on_click=self.handle_search)],
+            bar_trailing=[IconButton(icon=icons.MIC, tooltip="Voice Search",on_click=self.startlistening_sync), IconButton(icon=icons.SEARCH, on_click=self.handle_search)],
             controls=[
                 ListTile(title=Text(f"india"), on_click=self.close_anchor, data=i,bgcolor=colors.GREY_300)
                 for i in range(5)
             ],
         )
+    def startlistening_sync(self, event=None):
+       asyncio.run(self.startlistening(event))
 
+    async def startlistening(self,event=None):
+        speech_to_text = SpeechToText(noise_duration=1)
+        result=speech_to_text.listen_and_recognize()
+        if result:
+          self.search_box.value=result
+          await self.handle_search(None)
+          self.page.update()
+        
     def create_search_container(self):
         """Wrap the search box in a container with styling."""
         return Container(
@@ -162,7 +170,8 @@ class TorrentSearching:
         query = self.search_box.value
         if not query:
             return
-        # Clear previous results and show skeletons for 1 second
+        self.search_box.close_view(query)
+
         self.results.controls.clear()
         self.loading.visible=True
         self.content_area.visible = True

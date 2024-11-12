@@ -1,17 +1,20 @@
+from dotenv import load_dotenv
+from cryptography.fernet import Fernet
+
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
+
+load_dotenv()
 import aiohttp
 OMDB_API_URL = "http://www.omdbapi.com/"
-OMDB_API_KEY = "494e9276"
-from cryptography.fernet import Fernet
 import json
 import os
-from dotenv import load_dotenv
 import base64
-
 async def get_movie_details(imdb_id: str) -> dict:
         """Get detailed movie information"""
         async with aiohttp.ClientSession() as session:
             params = {
-                "apikey": OMDB_API_KEY,
+                "apikey": os.getenv('OMDB_API_KEY'),
                 "i": imdb_id,
                 "plot": "full"
             }
@@ -26,7 +29,7 @@ async def search_movies(query: str) -> list:
         """Search movies using OMDB API"""
         async with aiohttp.ClientSession() as session:
             params = {
-                "apikey": OMDB_API_KEY,
+                "apikey": os.getenv('OMDB_API_KEY'),
                 "s": query,
                 "type": "movie"
             }
@@ -36,13 +39,6 @@ async def search_movies(query: str) -> list:
                     if data.get("Response") == "True":
                         return data.get("Search", [])
                 return []
-
-
-
-key = Fernet.generate_key()
-cipher_suite = Fernet(key)
-
-load_dotenv()
 
 def generate_key():
     """Generate a valid Fernet key and return it in base64 format"""
@@ -98,7 +94,10 @@ def load_session_encrypted():
         with open("session.txt", "rb") as f:
             encrypted_data = f.read()
         decrypted_data = cipher_suite.decrypt(encrypted_data)
-        return json.loads(decrypted_data.decode())
+        session_data = json.loads(decrypted_data.decode())
+
+
+        return session_data
     except FileNotFoundError:
         print("No session file found")
         return None

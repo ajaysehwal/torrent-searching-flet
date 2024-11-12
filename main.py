@@ -2,8 +2,6 @@ import flet as ft
 from flet import *
 from utils.logger import setup_logger
 logger = setup_logger()
-OMDB_API_URL = "http://www.omdbapi.com/"
-OMDB_API_KEY = "494e9276"
 from router import AppRouter
 def main(page: ft.Page):
     page.padding = 0

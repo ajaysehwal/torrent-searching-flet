@@ -2,7 +2,7 @@ from appwrite.client import Client
 from appwrite.services.account import Account
 from appwrite.id import ID
 from utils.logger import setup_logger 
-from utils.helpers import save_session_encrypted,load_session_encrypted
+from helpers import save_session_encrypted,load_session_encrypted
 import os
 
 
@@ -10,7 +10,7 @@ class AuthServices:
     def __init__(self):
         self.logger = setup_logger()
         self.__APPWRITE_ENDPOINT="https://cloud.appwrite.io/v1"
-        self.__PROJECT_ID = "672a2a74003a8451a248"
+        self.__PROJECT_ID = "673198560005a6f1b910"
         self.__client=Client()
         self.__client.set_endpoint(self.__APPWRITE_ENDPOINT).set_project(self.__PROJECT_ID)
         self.account = Account(self.__client)
